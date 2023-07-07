@@ -8,6 +8,7 @@
 <body>
     <p>Bonjour</p>
     <p>Date d'aujourd'hui : {{ "now"|date("d/m/Y") }}</p>
-    <span>{{nom|capitalize}} {{prenom|capitalize}}<span>
+    <span>{{nom|capitalize}} {{prenom|capitalize}}<span><br>
+    <img src="{{ asset('assets/images/') ~ path | defaultImage }}" alt="">
 </body>
 </html>
