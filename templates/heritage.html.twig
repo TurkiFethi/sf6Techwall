@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {% block titreDuDocument %}
+        titre par défaut du document
+    {% endblock %} </title>
+</head>
+<body>
+    
+    header
+
+    <hr>
+
+    {% block corpDuDocument %}
+        du contenu par défaut du corpDuDocument
+    {% endblock %}
+
+    <hr>
+
+
+    footer
+
+</body>
+</html>

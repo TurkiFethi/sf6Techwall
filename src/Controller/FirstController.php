@@ -10,6 +10,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FirstController extends AbstractController
 {
+
+    #[Route('/template', name: 'template')]
+    public function template(): Response
+    {
+       
+        return $this->render('template.html.twig');
+    }
     
    #[Route('/first', name: 'first')]
     public function index(): Response
@@ -33,14 +40,13 @@ class FirstController extends AbstractController
         return $this->forward('App\Controller\FirstController::index');
     }
 
-    #[Route('/bonjour/{firstName}/{lastName}', name: 'bonjour')]
+   // #[Route('/bonjour/{firstName}/{lastName}', name: 'bonjour')]
     public function bonjour(Request $request ,$firstName,$lastName): Response
     {
        //dd($request);
         return $this->render('first/bonjour.html.twig',[
             'nom'=>$firstName,
-            'prenom'=>$lastName,
-            'path'=>'    '
+            'prenom'=>$lastName
 
         ]);
     }
