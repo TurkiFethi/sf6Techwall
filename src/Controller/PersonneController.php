@@ -27,9 +27,21 @@ class PersonneController extends AbstractController
     public function personnesByAge(ManagerRegistry $doctrine, $ageMin, $ageMax ): Response
     {
         $repository = $doctrine->getRepository(Personne::class);
-        $personnes = $repository->FindPersonnesByAgeInerval($ageMin,$ageMax);
+        $personnes = $repository->findPersonnesByAgeInterval($ageMin,$ageMax);
         return $this->render('personne/index.html.twig', ['personne' => $personnes]);
     }
+
+    #[Route('/stats/age/{ageMin}/{ageMax}', name: 'personne.list.age')]
+    public function statsPersonnesByAge(ManagerRegistry $doctrine, $ageMin, $ageMax): Response {
+        $repository = $doctrine->getRepository(Personne::class);
+        $stats = $repository->statsPersonnesByAgeInterval($ageMin, $ageMax);
+        return $this->render('personne/stats.html.twig', [
+            'stats' => $stats[0],
+            'ageMin'=> $ageMin,
+            'ageMax' => $ageMax]
+        );
+    }
+
 
 
     #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
