@@ -6,12 +6,12 @@ use App\Entity\Personne;
 use App\Form\PersonneType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('personne')]
 class PersonneController extends AbstractController
@@ -105,7 +105,8 @@ class PersonneController extends AbstractController
     public function addPersonne(
         Personne $personne = null,
         ManagerRegistry $doctrine,
-        Request $request
+        Request $request,
+        SluggerInterface $slugger
     ): Response
     {
         $new = false;
@@ -131,6 +132,28 @@ class PersonneController extends AbstractController
             } else {
                 $message = " a été mis à jour avec succès";
             }
+
+            $photo = $form->get('photo')->getData();
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($photo) {
+                $originalFilename = pathinfo($photo->getClientOriginalName(),PATHINFO_FILENAME);
+                $safeFileName = $slugger->slug($originalFilename);
+                $newFilename = $safeFileName.'-'.uniqid().'.'.$photo->guessExtension();
+
+                try{
+                    $photo->move(
+                        $this->getParameter('personne_directory'),
+                        $newFilename
+                    );
+
+                } catch(FileException $e){
+
+                }
+                $personne->setImage($newFilename);
+            } 
+
+
             $manager = $doctrine->getManager();
             $manager->persist($personne);
 
