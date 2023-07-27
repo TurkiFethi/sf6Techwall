@@ -100,7 +100,7 @@ class PersonneController extends AbstractController
     }
 
 
-
+   // une seule fonction pour ajouter et modifier une formailre
     #[Route('/edit/{id?0}', name: 'personne.edit')]
     public function addPersonne(
         Personne $personne = null,
