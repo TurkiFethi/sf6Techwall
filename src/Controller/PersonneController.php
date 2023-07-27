@@ -101,36 +101,52 @@ class PersonneController extends AbstractController
 
 
 
-    #[Route('/add', name: 'personne.add')]
-    public function addPersonne(ManagerRegistry $doctrine, Request $request): Response
+    #[Route('/edit/{id?0}', name: 'personne.edit')]
+    public function addPersonne(
+        Personne $personne = null,
+        ManagerRegistry $doctrine,
+        Request $request
+    ): Response
     {
-        //$this->getDoctrine() : version sf <= 5
-        $personne = new Personne();
+        $new = false;
+        //$this->getDoctrine() : Version Sf <= 5
+        if (!$personne) {
+            $new = true;
+            $personne = new Personne();
+        }
+
         // $personne est l'image de notre formulaire
         $form = $this->createForm(PersonneType::class, $personne);
         $form->remove('createdAt');
         $form->remove('updatedAt');
-        //Mon fomulaire va aller traiter la requette
+        // Mn formulaire va aller traiter la requete
         $form->handleRequest($request);
         //Est ce que le formulaire a été soumis
-        if ($form->isSubmitted()) {
-            //si oui
-            //on va ajouter l'objet personne dans la base de données
+        if($form->isSubmitted() && $form->isValid()) {
+            // si oui,
+            // on va ajouter l'objet personne dans la base de données
+          
+            if($new) {
+                $message = " a été ajouté avec succès";
+            } else {
+                $message = " a été mis à jour avec succès";
+            }
             $manager = $doctrine->getManager();
             $manager->persist($personne);
 
             $manager->flush();
-            //Afficher un message de succées
-            $this->addFlash("succes",$personne->getName()."a été ajouter avec succès");
-            //Rediger vers la liste des personnes 
+            // Afficher un mssage de succès
+            $this->addFlash('success',$personne->getName(). $message );
+            // Rediriger verts la liste des personne
             return $this->redirectToRoute('personne.list');
         } else {
-            //sinon 
+            //Sinon
             //On affiche notre formulaire
             return $this->render('personne/add-personne.html.twig', [
-                'form' => $form->createView(),
+                'form' => $form->createView()
             ]);
         }
+
     }
 
 
