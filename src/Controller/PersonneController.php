@@ -5,15 +5,15 @@ namespace App\Controller;
 use App\Entity\Personne;
 use App\Form\PersonneType;
 use App\Service\Helpers;
+use App\Service\PdfService;
+use App\Service\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('personne')]
 class PersonneController extends AbstractController
@@ -31,7 +31,6 @@ class PersonneController extends AbstractController
         $personne = $repository->findAll();
         return $this->render('personne/index.html.twig', ['personne' => $personne]);
     }
-
 
     #[Route('/alls/age/{ageMin}/{ageMax}', name: 'personne.list.age')]
     public function personnesByAge(ManagerRegistry $doctrine, $ageMin, $ageMax): Response
@@ -105,6 +104,7 @@ class PersonneController extends AbstractController
         }
 
 
+
         return $this->render('personne/detail.html.twig', ['personne' => $personne]);
     }
 
@@ -115,7 +115,7 @@ class PersonneController extends AbstractController
         Personne $personne = null,
         ManagerRegistry $doctrine,
         Request $request,
-        SluggerInterface $slugger
+        UploaderService $uploaderService
     ): Response
     {
         $new = false;
@@ -136,31 +136,21 @@ class PersonneController extends AbstractController
             // si oui,
             // on va ajouter l'objet personne dans la base de données
           
-            if($new) {
-                $message = " a été ajouté avec succès";
-            } else {
-                $message = " a été mis à jour avec succès";
-            }
-
             $photo = $form->get('photo')->getData();
             // this condition is needed because the 'brochure' field is not required
             // so the PDF file must be processed only when a file is uploaded
             if ($photo) {
-                $originalFilename = pathinfo($photo->getClientOriginalName(),PATHINFO_FILENAME);
-                $safeFileName = $slugger->slug($originalFilename);
-                $newFilename = $safeFileName.'-'.uniqid().'.'.$photo->guessExtension();
-
-                try{
-                    $photo->move(
-                        $this->getParameter('personne_directory'),
-                        $newFilename
-                    );
-
-                } catch(FileException $e){
-
-                }
-                $personne->setImage($newFilename);
+                $directory=$this->getParameter('personne_directory');
+                $personne->setImage($uploaderService->uploadFile($photo,$directory));
             } 
+
+            if($new) {
+                $message = " a été ajouté avec succès";
+                $personne->setCreatedBy($this->getUser());
+            } else {
+                $message = " a été mis à jour avec succès";
+            }
+
 
 
             $manager = $doctrine->getManager();

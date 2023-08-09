@@ -42,14 +42,9 @@
 					</a>
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="#!">Settings</a>
+							<a class="dropdown-item" href="{{ path('app_login') }}">Login</a>
 						</li>
-						<li>
-							<a class="dropdown-item" href="#!">Activity Log</a>
-						</li>
-						<li><hr class="dropdown-divider"/></li>
-						<li>
-							<a class="dropdown-item" href="#!">Logout</a>
+							<a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
 						</li>
 					</ul>
 				</li>
@@ -131,10 +126,17 @@
 							</a>
 						</div>
 					</div>
-					<div class="sb-sidenav-footer">
+					
+						<div class="sb-sidenav-footer">
 						<div class="small">Logged in as:</div>
-						Start Bootstrap
+						{% if app.user %}
+						{{ app.user.email }}
+							{% else %}
+					Anonumous
+					{% endif %}
 					</div>
+				
+					
 				</nav>
 			</div>
 			<div id="layoutSidenav_content">
