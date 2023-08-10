@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('personne')]
 class PersonneController extends AbstractController
@@ -57,7 +58,10 @@ class PersonneController extends AbstractController
 
 
 
-    #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
+    #[
+        Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls'),
+        IsGranted("ROLE_USER")
+        ]
     public function indexAlls(ManagerRegistry $doctrine, $page, $nbre): Response
     {
               echo($this->helper->sayCc());
@@ -118,6 +122,7 @@ class PersonneController extends AbstractController
         UploaderService $uploaderService
     ): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $new = false;
         //$this->getDoctrine() : Version Sf <= 5
         if (!$personne) {
