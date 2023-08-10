@@ -16,7 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('personne')]
+#[
+    Route('personne'),
+    IsGranted('ROLE_USER')
+    ]
 class PersonneController extends AbstractController
 {
 
@@ -178,7 +181,10 @@ class PersonneController extends AbstractController
 
 
 
-    #[Route('/delete/{id}', name: 'personne.delete')]
+    #[
+        Route('/delete/{id}', name: 'personne.delete'),
+        IsGranted('ROLE_ADMIN')
+        ]
     public function deletePersonne(Personne $personne = null, ManagerRegistry $doctrine): RedirectResponse
     {
 

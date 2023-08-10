@@ -29,14 +29,17 @@
 						{{personne.age}}
 					</p>
 					<a href=" {{ path('personne.detail',{id:personne.id}) }} " class="card-link">
-                    <i class="fa-solid fa-circle-info"></i>
-                    </a>
-					<a href=" {{ path('personne.delete',{id:personne.id}) }} " class="card-link">
-                    <i class="fa-solid fa-user-xmark"></i>
-                    </a>
-					<a href="{{ path('personne.edit', {id: personne.id}) }}" class="card-link">
-						<i class="fas fa-user-edit"></i>
+						<i class="fa-solid fa-circle-info"></i>
 					</a>
+					{% if is_granted('ROLE_ADMIN') %}
+
+						<a href=" {{ path('personne.delete',{id:personne.id}) }} " class="card-link">
+							<i class="fa-solid fa-user-xmark"></i>
+						</a>
+						<a href="{{ path('personne.edit', {id: personne.id}) }}" class="card-link">
+							<i class="fas fa-user-edit"></i>
+						</a>
+					{% endif %}
 
 
 				</div>
