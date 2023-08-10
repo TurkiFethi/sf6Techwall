@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Personne;
 use App\Event\AddPersonneEvent;
+use App\Event\ListAllPersonneEvent;
 use App\Form\PersonneType;
 use App\Service\Helpers;
 use App\Service\PdfService;
@@ -71,7 +72,7 @@ class PersonneController extends AbstractController
         Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls'),
         IsGranted("ROLE_USER")
         ]
-    public function indexAlls(ManagerRegistry $doctrine, $page, $nbre): Response
+    public function indexAlls(ManagerRegistry $doctrine, $page, $nbre,): Response
     {
               echo($this->helper->sayCc());
 
@@ -82,6 +83,8 @@ class PersonneController extends AbstractController
         $nbrePage = ceil($nbPersonne / $nbre);
 
         $personnes = $repository->findBy([], ['age' => 'asc'], $nbre, ($page - 1) * $nbre);
+        $listAllPersonneEvent = new ListAllPersonneEvent(count($personnes));
+        $this->dispatcher->dispatch($listAllPersonneEvent,ListAllPersonneEvent::LIST_ALL_PERSONNE_EVENT);
 
 
         return $this->render('personne/index.html.twig', [
