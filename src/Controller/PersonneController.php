@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Personne;
+use App\Event\AddPersonneEvent;
 use App\Form\PersonneType;
 use App\Service\Helpers;
 use App\Service\PdfService;
 use App\Service\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,7 +25,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PersonneController extends AbstractController
 {
 
-    public function __construct(private LoggerInterface $logger,private Helpers $helper)
+    public function __construct(
+        private LoggerInterface $logger,
+        private Helpers $helper,
+        private EventDispatcherInterface $dispatcher
+        )
     {
         
     }
@@ -165,6 +171,13 @@ class PersonneController extends AbstractController
             $manager->persist($personne);
 
             $manager->flush();
+
+            if($new){
+                // On a créer notre evenenment
+                $addPersonneEvent = new AddPersonneEvent($personne);
+                // On va maintenant dispatcher cet evenement
+                $this->dispatcher->dispatch($addPersonneEvent, AddPersonneEvent::ADD_PERSONNE_EVENT);
+            }
             // Afficher un mssage de succès
             $this->addFlash('success',$personne->getName(). $message );
             // Rediriger verts la liste des personne
